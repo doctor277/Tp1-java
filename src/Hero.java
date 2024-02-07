@@ -49,8 +49,8 @@ public class Hero {
     public int calculerExperience(){
         // methode pour pacluler l'experience pour atteindre le next level
         return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);
+        
     }
-    // test // test javatest tset test tset
 }
     
 
