@@ -51,6 +51,8 @@ public class Hero {
         return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);
     }
 
+    public int
+    //test test test
 }
     
 
