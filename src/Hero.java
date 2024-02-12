@@ -17,8 +17,15 @@ public class Hero {
         this.damageInflicted = damageInflicted;
     }
 
-    // im not sure if its right or no 
-    // but iguess we're missing getters and setters
+    public String getHero() {
+    char premiereLettre = this.nom.charAt(0);
+    if (premiereLettre == 'A') {
+        return "Attaque";
+    } else if (premiereLettre == 'D') {
+        return "Défense";
+    } else {
+        return "Équilibre";}
+    }
 
     public int getHealth(){
         return this.health;
@@ -36,7 +43,10 @@ public class Hero {
         this.attackPoints = newAttackPoints;
     }
 
-
+    public boolean isAlive(){
+        // pour checker if the hero is alive ou non
+        return this.health > 0;
+    }
 
     public void takeDamage(int damage){
         // methode pour handle le damage taken by the hero  
@@ -45,7 +55,35 @@ public class Hero {
             this.health = 0;
         }
     }
+
     
+
+    public boolean fight(int numEnemies) {
+        int totalDamage;
+        String type = getHero();
+    
+        // Si le héros est de type attaque
+        if (type.equals("Attaque")) {
+            totalDamage = numEnemies * getAttackPoints() * 2;
+            this.damageInflicted += totalDamage;
+            takeDamage(totalDamage * 2); // Reçoit le double des dégâts
+        } 
+        // Si le héros est de type défense
+        else if (type.equals("Défense")) {
+            totalDamage = numEnemies * getAttackPoints() / 2;
+            this.damageInflicted += totalDamage;
+            takeDamage(totalDamage / 2); // Ne reçoit que la moitié des dégâts
+        } 
+        // Si le héros est de type équilibre ou autre
+        else {
+            totalDamage = numEnemies * getAttackPoints();
+            this.damageInflicted += totalDamage;
+            takeDamage(totalDamage); // Dégâts normaux
+        }
+        return isAlive();
+    }
+
+
     public void levelUp(){
         // methode pour le level up
         if(this.level < 99){
@@ -55,7 +93,8 @@ public class Hero {
             this.attackPoints += 6;         // augmenter le attack points
         }
     }
-    
+
+
     public void gainExp(int experiencePoints){
         // methode pour gagner des experiences 
         // exp_requis = 50 + niveau_voulu * 20 * (1.1^niveau_voulu)
@@ -71,14 +110,6 @@ public class Hero {
         // methode pour pacluler l'experience pour atteindre le next level
         // exp_requis = 50 + niveau_voulu * 20 * (1.1^niveau_voulu)
         return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);   
-    }
-    
-    public boolean fight(int numEnemies) {
-        // the fight action of the Hero
-        int totalDamage = numEnemies * this.attackPoints * 2; // Car c'est double damage
-        this.damageInflicted += totalDamage;
-        takeDamage(totalDamage);
-        return isAlive();
     }
 
     public boolean rest() {
@@ -101,12 +132,3 @@ public class Hero {
         this.attackPoints += trainingPoints;
         return isAlive();
     }
-
-    public boolean isAlive(){
-        // pour checker if the hero is alive ou non
-        return this.health > 0;
-    }
-
-
-}
-
