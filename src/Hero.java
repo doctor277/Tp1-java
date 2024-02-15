@@ -7,7 +7,7 @@ public class Hero {
     private int attackPoints;
     private int damageInflicted;
 
-    public Hero(String nom, int health, int maxHealth, int level, int experience, int attackPoints, int damageInflicted){
+    public Hero(String nom, int health, int maxHealth, int level, int experience, int attackPoints, int damageInflicted) {
         this.nom = nom;
         this.health = health;
         this.maxHealth = maxHealth;
@@ -18,108 +18,117 @@ public class Hero {
     }
 
     public String getHero() {
-    char premiereLettre = this.nom.charAt(0);
-    if (premiereLettre == 'A') {
-        return "Attaque";
-    } else if (premiereLettre == 'D') {
-        return "Défense";
-    } else {
-        return "Équilibre";}
+        char premiereLettre = this.nom.charAt(0);
+        if (premiereLettre == 'A') {
+            return "Attaque";
+        } else if (premiereLettre == 'D') {
+            return "Défense";
+        } else {
+            return "Équilibre";
+        }
     }
 
-    public int getHealth(){
+    public int getLevel() {
+        return this.level;
+    }
+
+    public String getNom() {
+        return this.nom;
+    }
+
+    public int getDamageInflicted() {
+        return this.damageInflicted;
+    }
+
+    public int getHealth() {
         return this.health;
     }
 
-    public void setHealth(int newHealth){
+    public void setHealth(int newHealth) {
         this.health = newHealth;
     }
-     
-    public int getAttackPoints(){
+
+    public int getAttackPoints() {
         return this.attackPoints;
     }
-    
-    public void setAttackPoints(int newAttackPoints){
+
+    public void setAttackPoints(int newAttackPoints) {
         this.attackPoints = newAttackPoints;
     }
 
-    public boolean isAlive(){
-        // pour checker if the hero is alive ou non
+    public boolean isAlive() {
         return this.health > 0;
     }
 
-    public void takeDamage(int damage){
-        // methode pour handle le damage taken by the hero  
+    public void takeDamage(int damage) {
         this.health -= damage;
-        if(this.health < 0){
+        if (this.health < 0) {
             this.health = 0;
         }
     }
 
-    
-
-    public boolean fight(int numEnemies) {
-        int totalDamage;
+    public boolean fight() {
         String type = getHero();
     
-        // Si le héros est de type attaque
-        if (type.equals("Attaque")) {
-            totalDamage = numEnemies * getAttackPoints() * 2;
-            this.damageInflicted += totalDamage;
-            takeDamage(totalDamage * 2); // Reçoit le double des dégâts
-        } 
-        // Si le héros est de type défense
-        else if (type.equals("Défense")) {
-            totalDamage = numEnemies * getAttackPoints() / 2;
-            this.damageInflicted += totalDamage;
-            takeDamage(totalDamage / 2); // Ne reçoit que la moitié des dégâts
-        } 
-        // Si le héros est de type équilibre ou autre
-        else {
-            totalDamage = numEnemies * getAttackPoints();
-            this.damageInflicted += totalDamage;
-            takeDamage(totalDamage); // Dégâts normaux
+        // Statistiques initiales de l'ennemi
+        int initialEnemyHealth = 100;
+        int initialEnemyAttack = 25;
+        int initialEnemyExperience = 35;
+    
+        // Combat entre le héros et l'ennemi
+        while (this.isAlive() && initialEnemyHealth > 0) {
+            // Calcul des dégâts infligés par le héros à l'ennemi
+            if (type.equals("Attaque")) {
+                initialEnemyHealth -= this.attackPoints * 2;
+            } else if (type.equals("Défense")) {
+                initialEnemyHealth -= this.attackPoints / 2;
+            } else if (type.equals("Équilibre")) {
+                initialEnemyHealth -= this.attackPoints;
+            }
+    
+            // Vérifier si l'ennemi est mort après l'attaque du héros
+            if (initialEnemyHealth <= 0) {
+                // Augmenter les statistiques de l'ennemi pour le prochain combat
+                initialEnemyHealth += 10;
+                initialEnemyAttack += 5;
+                initialEnemyExperience += 8;
+                break; // Sortir de la boucle si l'ennemi est mort
+            }
+    
+            // Calcul des dégâts infligés par l'ennemi au héros
+            this.takeDamage(initialEnemyAttack);
         }
-        return isAlive();
+    
+        return this.isAlive();
     }
 
-
-    public void levelUp(){
-        // methode pour le level up
-        if(this.level < 99){
-            this.level++;                   
-            this.maxHealth += 12;           //  augmenter le maximum health 
-            this.health = this.maxHealth;   // restore le health on level up
-            this.attackPoints += 6;         // augmenter le attack points
+    public void levelUp() {
+        if (this.level < 99) {
+            this.level++;
+            this.maxHealth += 12;
+            this.health = this.maxHealth;
+            this.attackPoints += 6;
         }
     }
 
-
-    public void gainExp(int experiencePoints){
-        // methode pour gagner des experiences 
-        // exp_requis = 50 + niveau_voulu * 20 * (1.1^niveau_voulu)
+    public void gainExp(int experiencePoints) {
         this.experience += experiencePoints;
-        
-        // check si le hero peut se level up
-        while( this.experience >= calculerExperience()){
+
+        while (this.experience >= calculerExperience()) {
             levelUp();
         }
     }
 
-    public int calculerExperience(){
-        // methode pour pacluler l'experience pour atteindre le next level
-        // exp_requis = 50 + niveau_voulu * 20 * (1.1^niveau_voulu)
-        return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);   
+    public int calculerExperience() {
+        return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);
     }
 
     public boolean rest() {
-        // the rest action of the Hero
-        this.health = this.maxHealth; // restore health
+        this.health = this.maxHealth;
         return isAlive();
     }
 
-    public boolean heal(int healthPoints){
-        // the heal action of the Hero
+    public boolean heal(int healthPoints) {
         this.health += healthPoints;
         if (this.health > this.maxHealth) {
             this.health = this.maxHealth;
@@ -127,8 +136,8 @@ public class Hero {
         return isAlive();
     }
 
-    public boolean train(int trainingPoints){
-        // handle the train action of the Hero
+    public boolean train(int trainingPoints) {
         this.attackPoints += trainingPoints;
         return isAlive();
     }
+}
