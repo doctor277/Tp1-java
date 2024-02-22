@@ -5,16 +5,14 @@ public class Hero {
     private int level;
     private int experience;
     private int attackPoints;
-    private int damageInflicted;
 
-    public Hero(String nom, int health, int maxHealth, int level, int experience, int attackPoints, int damageInflicted) {
+    public Hero(String nom, int health, int maxHealth, int level, int experience, int attackPoints) {
         this.nom = nom;
         this.health = health;
         this.maxHealth = maxHealth;
         this.level = level;
         this.experience = experience;
         this.attackPoints = attackPoints;
-        this.damageInflicted = damageInflicted;
     }
 
     public String getHero() {
@@ -34,10 +32,6 @@ public class Hero {
 
     public String getNom() {
         return this.nom;
-    }
-
-    public int getDamageInflicted() {
-        return this.damageInflicted;
     }
 
     public int getHealth() {
@@ -69,12 +63,12 @@ public class Hero {
 
     public boolean fight() {
         String type = getHero();
-    
+
         // Statistiques initiales de l'ennemi
         int initialEnemyHealth = 100;
         int initialEnemyAttack = 25;
         int initialEnemyExperience = 35;
-    
+
         // Combat entre le héros et l'ennemi
         while (this.isAlive() && initialEnemyHealth > 0) {
             // Calcul des dégâts infligés par le héros à l'ennemi
@@ -85,20 +79,21 @@ public class Hero {
             } else if (type.equals("Équilibre")) {
                 initialEnemyHealth -= this.attackPoints;
             }
-    
+
             // Vérifier si l'ennemi est mort après l'attaque du héros
             if (initialEnemyHealth <= 0) {
                 // Augmenter les statistiques de l'ennemi pour le prochain combat
                 initialEnemyHealth += 10;
                 initialEnemyAttack += 5;
                 initialEnemyExperience += 8;
+                gainExp(initialEnemyExperience);
                 break; // Sortir de la boucle si l'ennemi est mort
             }
-    
+
             // Calcul des dégâts infligés par l'ennemi au héros
             this.takeDamage(initialEnemyAttack);
         }
-    
+
         return this.isAlive();
     }
 
