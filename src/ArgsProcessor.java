@@ -1,4 +1,4 @@
-public class ArgsProcessor2 {
+public class ArgsProcessor {
     public static void process(String[] args) {
         String[] phrase = makePhrase(args[0]);
 
