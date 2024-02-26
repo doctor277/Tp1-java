@@ -1,138 +1,136 @@
-public class Hero {
-    private String nom;
-    private int health;
-    private int maxHealth;
-    private int level;
-    private int experience;
-    private int attackPoints;
+// Classe de base abstraite pour les personnages de type Héros dans le système RPG
+public abstract class Hero {
 
-    public Hero(String nom, int health, int maxHealth, int level, int experience, int attackPoints) {
-        this.nom = nom;
+    // Attributs protégés, permettant un accès dans les classes dérivées
+    protected int health;               // Santé actuelle du héros
+    protected int maxHealth;            // Santé maximale du héros
+    protected int attackPoints;         // Puissance d'attaque du héros
+    protected int experience = 0;       // Points d'expérience actuels
+    protected int level = 1;            // Niveau actuel du héros
+    protected Enemy enemy;              // Ennemi que le héros combat
+    protected int nbrOfEnemyDefeated = 0; // Nombre d'ennemis vaincus
+
+    // Constructeur de la classe Hero
+    public Hero(int health, int attackPoints) {
         this.health = health;
-        this.maxHealth = maxHealth;
-        this.level = level;
-        this.experience = experience;
+        this.maxHealth = health;
         this.attackPoints = attackPoints;
+        this.enemy = new Enemy(100, 25, 35); // Création d'un ennemi initial
     }
 
-    public String getHero() {
-        char premiereLettre = this.nom.charAt(0);
-        if (premiereLettre == 'A') {
-            return "Attaque";
-        } else if (premiereLettre == 'D') {
-            return "Défense";
-        } else {
-            return "Équilibre";
+    // Méthode pour combattre un nombre défini d'ennemis
+    public boolean fight(int numberOfEnemies) {
+        for (int i = 0; i < numberOfEnemies; i++) {
+            engageEnemy(); // Engager le combat avec l'ennemi
+            if (this.health <= 0)
+                return false; // Le héros meurt si sa santé tombe à 0 ou moins
+            this.nbrOfEnemyDefeated += 1; // Incrémenter le nombre d'ennemis vaincus
+            this.experience += this.enemy.getExperienceGiven(); // Ajouter l'expérience gagnée
+            if (this.level <= 99)
+                this.checkLevelUp(); // Vérifier si le héros peut monter de niveau
+            this.enemy.gainPower(); // Augmenter la puissance de l'ennemi pour le prochain combat
+        }
+        return true; // Retourne vrai si le héros survit à tous les combats
+    }
+
+    // Méthode pour vérifier et gérer la montée de niveau du héros
+    protected void checkLevelUp() {
+        int nextLevel = this.level + 1;
+        // Calculer l'expérience requise pour le prochain niveau
+        int experienceNeeded = (int) Math.ceil(50 + nextLevel * 20 * (Math.pow(1.1, nextLevel)));
+        if (this.experience >= experienceNeeded) {
+            this.level += 1; // Monter de niveau
+            this.maxHealth += 12; // Augmenter la santé maximale
+            this.health = this.maxHealth; // Restaurer la santé complète
+            this.attackPoints += 6; // Augmenter les points d'attaque
+            this.experience = 0; // Réinitialiser les points d'expérience
         }
     }
 
-    public int getLevel() {
-        return this.level;
+    // Méthode abstraite pour engager le combat avec l'ennemi
+    public abstract void engageEnemy();
+
+    // Méthode pour permettre au héros de se reposer et restaurer sa santé
+    public void rest() {
+        this.health = maxHealth; // Restaurer la santé à son maximum
     }
 
-    public String getNom() {
-        return this.nom;
+    // Méthode pour soigner le héros
+    public void heal(int n) {
+        if (n > this.maxHealth - this.health)
+            this.health = this.maxHealth; // Ne pas dépasser la santé maximale
+        else
+            this.health += n; // Ajouter les points de soin à la santé actuelle
     }
 
-    public int getHealth() {
-        return this.health;
+    // Méthode pour entraîner le héros et augmenter ses points d'attaque
+    public void train(int n) {
+        this.attackPoints += n; // Augmenter les points d'attaque du héros
+    }
+}
+
+// Classe dérivée AttackHero, spécialisée dans les attaques puissantes
+class AttackHero extends Hero {
+
+    public AttackHero(int health, int attackPoints) {
+        super(health, attackPoints);
     }
 
-    public void setHealth(int newHealth) {
-        this.health = newHealth;
-    }
-
-    public int getAttackPoints() {
-        return this.attackPoints;
-    }
-
-    public void setAttackPoints(int newAttackPoints) {
-        this.attackPoints = newAttackPoints;
-    }
-
-    public boolean isAlive() {
-        return this.health > 0;
-    }
-
-    public void takeDamage(int damage) {
-        this.health -= damage;
-        if (this.health < 0) {
-            this.health = 0;
+    @Override
+    public void engageEnemy() {
+        // Implémentation du combat pour un héros de type attaque
+        while (true) {
+            int enemyHealthLeft = this.enemy.getHealth() - 2 * this.attackPoints;
+            this.enemy.setHealth(enemyHealthLeft); // Infliger des dégâts doublés à l'ennemi
+            if (this.enemy.getHealth() <= 0)
+                return; // Terminer le combat si l'ennemi est vaincu
+            this.health -= 2 * this.enemy.getAttackPoints(); // Le héros reçoit des dégâts doublés
+            if (this.health <= 0)
+                return; // Terminer le combat si le héros meurt
         }
     }
+}
 
-    public boolean fight() {
-        String type = getHero();
+// Classe dérivée DefenseHero, spécialisée dans la défense
+class DefenseHero extends Hero {
 
-        // Statistiques initiales de l'ennemi
-        int initialEnemyHealth = 100;
-        int initialEnemyAttack = 25;
-        int initialEnemyExperience = 35;
-
-        // Combat entre le héros et l'ennemi
-        while (this.isAlive() && initialEnemyHealth > 0) {
-            // Calcul des dégâts infligés par le héros à l'ennemi
-            if (type.equals("Attaque")) {
-                initialEnemyHealth -= this.attackPoints * 2;
-            } else if (type.equals("Défense")) {
-                initialEnemyHealth -= this.attackPoints / 2;
-            } else if (type.equals("Équilibre")) {
-                initialEnemyHealth -= this.attackPoints;
-            }
-
-            // Vérifier si l'ennemi est mort après l'attaque du héros
-            if (initialEnemyHealth <= 0) {
-                // Augmenter les statistiques de l'ennemi pour le prochain combat
-                initialEnemyHealth += 10;
-                initialEnemyAttack += 5;
-                initialEnemyExperience += 8;
-                gainExp(initialEnemyExperience);
-                break; // Sortir de la boucle si l'ennemi est mort
-            }
-
-            // Calcul des dégâts infligés par l'ennemi au héros
-            this.takeDamage(initialEnemyAttack);
-        }
-
-        return this.isAlive();
+    public DefenseHero(int health, int attackPoints) {
+        super(health, attackPoints);
     }
 
-    public void levelUp() {
-        if (this.level < 99) {
-            this.level++;
-            this.maxHealth += 12;
-            this.health = this.maxHealth;
-            this.attackPoints += 6;
+    @Override
+    public void engageEnemy() {
+        // Implémentation du combat pour un héros de type défense
+        while (this.health > 0 && this.enemy.getHealth() > 0) {
+            int enemyHealthLeft = this.enemy.getHealth() - this.attackPoints / 2;
+            this.enemy.setHealth(enemyHealthLeft); // Infliger la moitié des dégâts normaux à l'ennemi
+            if (this.enemy.getHealth() <= 0)
+                return; // Terminer le combat si l'ennemi est vaincu
+            this.health -= this.enemy.getAttackPoints() / 2; // Le héros reçoit la moitié des dégâts normaux
+            if (this.health <= 0)
+                return; // Terminer le combat si le héros meurt
         }
     }
+}
 
-    public void gainExp(int experiencePoints) {
-        this.experience += experiencePoints;
+// Classe dérivée BalancedHero, un héros équilibré en attaque et défense
+class BalancedHero extends Hero {
 
-        while (this.experience >= calculerExperience()) {
-            levelUp();
+    public BalancedHero(int health, int attackPoints) {
+        super(health, attackPoints);
+    }
+
+    @Override
+    public void engageEnemy() {
+        // Implémentation du combat pour un héros de type équilibré
+        while (this.health > 0 && this.enemy.getHealth() > 0) {
+            int enemyHealthLeft = this.enemy.getHealth() - this.attackPoints;
+            this.enemy.setHealth(enemyHealthLeft); // Infliger des dégâts normaux à l'ennemi
+            if (this.enemy.getHealth() <= 0)
+                return; // Terminer le combat si l'ennemi est vaincu
+            this.health -= this.enemy.getAttackPoints(); // Le héros reçoit des dégâts normaux
+            if (this.health <= 0)
+                return; // Terminer le combat si le héros meurt
         }
-    }
-
-    public int calculerExperience() {
-        return 50 + this.level * 20 * (int) Math.pow(1.1, this.level);
-    }
-
-    public boolean rest() {
-        this.health = this.maxHealth;
-        return isAlive();
-    }
-
-    public boolean heal(int healthPoints) {
-        this.health += healthPoints;
-        if (this.health > this.maxHealth) {
-            this.health = this.maxHealth;
-        }
-        return isAlive();
-    }
-
-    public boolean train(int trainingPoints) {
-        this.attackPoints += trainingPoints;
-        return isAlive();
     }
 }
