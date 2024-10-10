@@ -6,7 +6,7 @@ Le projet met l'accent sur la conception de personnages, la gestion de l’expé
 
 
 Structure du projet
-.   Hero.java: Classe représentant le héros avec ses attributs et son comportement.
-.   Enemy.java: Classe représentant les ennemis que le héros combat.
-.   ArgsProcessor.java: Classe pour traiter les arguments et les actions du héros.
-.   Main.java: Classe principale qui exécute le programme
+1-   Hero.java: Classe représentant le héros avec ses attributs et son comportement.
+2-   Enemy.java: Classe représentant les ennemis que le héros combat.
+3-   ArgsProcessor.java: Classe pour traiter les arguments et les actions du héros.
+4-   Main.java: Classe principale qui exécute le programme
